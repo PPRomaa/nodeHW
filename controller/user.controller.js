@@ -1,11 +1,11 @@
-const userDb = require("../database/users");
+const User = require("../database/User");
 
 module.exports = {
-    getAllUsers: (req, res, next) => {
+    getAllUsers: async (req, res, next) => {
         try {
-            console.log('USERS ENDPOINT!');
+            const users = await User.find({});
 
-            res.json(userDb);
+            res.json(users);
         } catch (e) {
             next(e)
         }
@@ -19,16 +19,34 @@ module.exports = {
         }
     },
 
-    updateUser: (req, res, next) => {
+    updateUser: async (req, res, next) => {
         try {
             const newUserInfo = req.body;
             const userId = req.params.userId;
 
-            userDb[userId] = newUserInfo;
+            await User.findByIdAndUpdate(userId, newUserInfo);
 
             res.json('Updated')
-        }catch (e) {
+        } catch (e) {
             next(e)
         }
-    }
+    },
+    createUser:async (req, res, next) => {
+        try {
+            await User.create(req.body);
+
+            res.json('Ok');
+        } catch (e) {
+            next(e)
+        }
+    },
+    deleteUserById: async (req, res, next) => {
+        try {
+            await User.deleteOne({_id: req.params.userId});
+
+            res.status(204).send('Ok');
+        } catch (e) {
+            next(e)
+        }
+    },
 }
